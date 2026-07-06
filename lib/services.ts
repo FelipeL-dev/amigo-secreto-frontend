@@ -36,6 +36,11 @@ export async function gerarConvite(id: number) {
   return data
 }
 
+export async function entrarNoGrupo(token: string) {
+  const { data } = await api.post(`/api/grupos/entrar/${token}`)
+  return data
+}
+
 export async function getGrupo(id: number) {
   const { data } = await api.get<Grupo>(`/api/grupos/${id}`)
   return data
