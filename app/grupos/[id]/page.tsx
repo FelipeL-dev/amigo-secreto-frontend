@@ -54,17 +54,18 @@ function GrupoContent({ id }: { id: number }) {
   }
 
   async function handleGerarConvite() {
-    setGerandoConvite(true);
-    try {
-      const link = await gerarConvite(id);
-      await navigator.clipboard.writeText(link);
-      toast.success("Link copiado para a área de transferência!");
-    } catch {
-      toast.error("Não foi possível gerar o convite.");
-    } finally {
-      setGerandoConvite(false);
-    }
+  setGerandoConvite(true);
+  try {
+    const token = await gerarConvite(id);
+    const link = `${window.location.origin}/entrar/${token}`;
+    await navigator.clipboard.writeText(link);
+    toast.success("Link copiado para a área de transferência!");
+  } catch {
+    toast.error("Não foi possível gerar o convite.");
+  } finally {
+    setGerandoConvite(false);
   }
+}
 
   return (
     <div className="min-h-svh bg-muted/40">
