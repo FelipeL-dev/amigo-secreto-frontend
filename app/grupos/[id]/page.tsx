@@ -9,29 +9,37 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  LinkIcon,
   Pencil,
   Users,
   X,
   Check,
 } from "lucide-react";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppHeader } from "@/components/app-header";
 import { SorteioPanel } from "@/components/sorteio-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { updateGrupo } from "@/lib/services";
+import { updateGrupo, gerarConvite, getGrupo, getPessoasDoGrupo } from "@/lib/services";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getGrupo, getPessoasDoGrupo } from "@/lib/services";
 import { formatDate } from "@/lib/format";
 import type { Grupo, Pessoa } from "@/lib/types";
 
 function GrupoContent({ id }: { id: number }) {
   const [editando, setEditando] = useState(false);
   const [novoNome, setNovoNome] = useState("");
-  const { mutate: mutateGrupo } = useSWR<Grupo>(["grupo", id], () =>
-    getGrupo(id),
+  const [gerandoConvite, setGerandoConvite] = useState(false);
+
+  const { data: grupo, isLoading: loadingGrupo, mutate: mutateGrupo } = useSWR<Grupo>(
+    ["grupo", id],
+    () => getGrupo(id),
+  );
+
+  const { data: pessoas, isLoading: loadingPessoas } = useSWR<Pessoa[]>(
+    ["pessoas-grupo", id],
+    () => getPessoasDoGrupo(id),
   );
 
   async function salvarNome() {
@@ -44,15 +52,19 @@ function GrupoContent({ id }: { id: number }) {
       toast.error("Não foi possível atualizar o grupo.");
     }
   }
-  const { data: grupo, isLoading: loadingGrupo } = useSWR<Grupo>(
-    ["grupo", id],
-    () => getGrupo(id),
-  );
 
-  const { data: pessoas, isLoading: loadingPessoas } = useSWR<Pessoa[]>(
-    ["pessoas-grupo", id],
-    () => getPessoasDoGrupo(id),
-  );
+  async function handleGerarConvite() {
+    setGerandoConvite(true);
+    try {
+      const link = await gerarConvite(id);
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copiado para a área de transferência!");
+    } catch {
+      toast.error("Não foi possível gerar o convite.");
+    } finally {
+      setGerandoConvite(false);
+    }
+  }
 
   return (
     <div className="min-h-svh bg-muted/40">
@@ -122,18 +134,33 @@ function GrupoContent({ id }: { id: number }) {
                   </p>
                 )}
               </div>
-              {grupo &&
-                (grupo.sorteado ? (
-                  <Badge className="bg-accent text-accent-foreground hover:bg-accent">
-                    <CheckCircle2 className="size-3" />
-                    Sorteado
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary">
-                    <Clock className="size-3" />
-                    Pendente
-                  </Badge>
-                ))}
+              <div className="flex items-center gap-2">
+                {grupo &&
+                  (grupo.sorteado ? (
+                    <Badge className="bg-accent text-accent-foreground hover:bg-accent">
+                      <CheckCircle2 className="size-3" />
+                      Sorteado
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">
+                      <Clock className="size-3" />
+                      Pendente
+                    </Badge>
+                  ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGerarConvite}
+                  disabled={gerandoConvite}
+                >
+                  {gerandoConvite ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <LinkIcon className="size-4" />
+                  )}
+                  Convidar
+                </Button>
+              </div>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">

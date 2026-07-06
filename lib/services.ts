@@ -31,6 +31,11 @@ export async function updateGrupo(id: number, nome: string) {
   return data
 }
 
+export async function gerarConvite(id: number) {
+  const { data } = await api.post<string>(`/api/grupos/${id}/convite`)
+  return data
+}
+
 export async function getGrupo(id: number) {
   const { data } = await api.get<Grupo>(`/api/grupos/${id}`)
   return data
