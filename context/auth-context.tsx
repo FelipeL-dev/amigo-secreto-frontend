@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (payload: RegisterRequest) => {
     const data = await services.register(payload)
     setTokens(data.token, data.refreshToken)
-    setIsAuthenticated(true)
+    setIsAuthenticated(false)
   }, [])
 
   return (

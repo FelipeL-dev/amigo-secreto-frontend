@@ -20,6 +20,16 @@ export async function register(payload: RegisterRequest) {
   return data
 }
 
+export async function verificarEmail(codigo: string) {
+  const { data } = await api.post("/auth/verificar", { codigo })
+  return data
+}
+
+export async function reenviarVerificacao(email: string) {
+  const { data } = await api.post("/auth/reenviar-verificacao", { email })
+  return data
+}
+
 // --- Grupos ---
 export async function getMeusGrupos() {
   const { data } = await api.get<Grupo[]>("/api/grupos/meus")

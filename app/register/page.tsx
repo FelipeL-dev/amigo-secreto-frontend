@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Gift, Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { useAuth } from "@/context/auth-context"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Gift, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/context/auth-context";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,36 +14,36 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { getErrorMessage } from "@/lib/error"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getErrorMessage } from "@/lib/error";
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const { register, isAuthenticated, loading: authLoading } = useAuth()
-  const [nome, setNome] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [submitting, setSubmitting] = useState(false)
+  const router = useRouter();
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     }
-  }, [authLoading, isAuthenticated, router])
+  }, [authLoading, isAuthenticated, router]);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
     try {
-      await register({ nome, email, password })
-      toast.success("Conta criada com sucesso!")
-      router.push("/dashboard")
+      await register({ nome, email, password });
+      toast.success("Conta criada! Verifique seu email.");
+      router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Não foi possível criar a conta."))
+      toast.error(getErrorMessage(err, "Não foi possível criar a conta."));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -118,5 +118,5 @@ export default function RegisterPage() {
         </form>
       </Card>
     </main>
-  )
+  );
 }
